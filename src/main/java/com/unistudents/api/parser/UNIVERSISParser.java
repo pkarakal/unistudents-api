@@ -63,7 +63,7 @@ public class UNIVERSISParser {
             int totalPassedCoursesWithoutGrades = 0;
             float totalPassedCoursesSum = 0;
             double totalECTS = 0;
-            for (int i = 0; i < semesters.size() - 1; i++) {
+            for (int i = 0; i < semesters.size(); i++) {
                 Semester semester = semesters.get(i);
                 int semesterPassedCourses = 0;
                 float semesterPassedCoursesSum = 0;
@@ -71,6 +71,7 @@ public class UNIVERSISParser {
                 for (JsonNode courseJSON : courses) {
                     Course course = new Course();
                     int courseSemester = courseJSON.get("semester").get("id").asInt();
+                    courseSemester = mapSemesterId(courseSemester);
                     if (i == courseSemester - 1) {
                         String id = courseJSON.get("course").get("displayCode").asText();
                         String name = courseJSON.get("courseTitle").asText();
@@ -184,8 +185,8 @@ public class UNIVERSISParser {
 
     // Initialize semesters.
     private ArrayList<Semester> initSemesters() {
-        Semester[] semesters = new Semester[12];
-        for (int i = 1; i <= 12; i++) {
+        Semester[] semesters = new Semester[15];
+        for (int i = 1; i <= 15; i++) {
             semesters[i - 1] = new Semester();
             semesters[i - 1].setId(i);
             semesters[i - 1].setPassedCourses(0);
@@ -193,6 +194,19 @@ public class UNIVERSISParser {
             semesters[i - 1].setCourses(new ArrayList<>());
         }
         return new ArrayList<>(Arrays.asList(semesters));
+    }
+
+    private int mapSemesterId(int semesterId) {
+        switch (semesterId) {
+            case 255:
+                return 13;
+            case 251:
+                return 14;
+            case 252:
+                return 15;
+            default:
+                return semesterId;
+        }
     }
 
     public Student parseInfoAndGradesJSON(String infoJSON, String gradesJSON) {
